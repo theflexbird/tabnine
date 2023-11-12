@@ -1,34 +1,28 @@
+import Redis from 'ioredis';
+
 export default class Queue
 {
     private static _instance: Queue;
-    private queues: any;
+    private redis: Redis;
 
     private constructor()
     {
-        this.queues = {};
+        this.redis = new Redis();
     }
 
     public addMessage(queueName: string, message: any)
     {
-        if (!this.queues[queueName])
-        {
-            this.queues[queueName] = [];
-        }
-        this.queues[queueName].push(message);
+        this.redis.lpush(queueName, message);
     }
 
-    public getMessage(queueName: string)
+    public async getMessage(queueName: string)
     {
-        if (!this.queues[queueName])
-        {
-            return null;
-        }
-        return this.queues[queueName].shift();
+        const message = await this.redis.rpop(queueName);
+        return message;
     }
 
     public static get Instance()
     {
-
         return this._instance || (this._instance = new this());
     }
 }

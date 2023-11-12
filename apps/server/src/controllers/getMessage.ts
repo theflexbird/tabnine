@@ -12,11 +12,10 @@ const func = async (req: Request, res: Response) => {
     let elapsed = 0;
     let message = null;
     while (elapsed < timeout) {
-        message = queue.getMessage(queue_name);
+        message = await queue.getMessage(queue_name);
         if (message !== null && message !== undefined) {
             break;
         }
-        queue.getMessage(queue_name)
         await new Promise((resolve) => setTimeout(resolve, interval));
         elapsed += interval;
     }
